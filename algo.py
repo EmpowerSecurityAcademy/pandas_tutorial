@@ -1,16 +1,19 @@
+from sklearn.ensemble import RandomForestClassifier
+from numpy import genfromtxt, savetxt
 
+def main():
+    #create the training & test sets, skipping the header row with [1:]
+    dataset = genfromtxt(open('clean.csv','r'), delimiter=',', dtype='f8')[1:]    
+    target = [x[1] for x in dataset]
+    train = [x[2:] for x in dataset]
+    test = genfromtxt(open('test.csv','r'), delimiter=',', dtype='f8')[1:]
+    
+    #create and train the random forest
+    #multi-core CPUs can use: rf = RandomForestClassifier(n_estimators=100, n_jobs=2)
+    rf = RandomForestClassifier(n_estimators=100)
+    rf.fit(train, target)
 
-#https://www.kaggle.com/c/titanic/details/getting-started-with-random-forests
+    savetxt('submission.csv', rf.predict(test), delimiter=',', fmt='%f')
 
-# Import the random forest package
-from sklearn.ensemble import RandomForestClassifier 
-
-# Create the random forest object which will include all the parameters
-# for the fit
-forest = RandomForestClassifier(n_estimators = 100)
-
-# Fit the training data to the Survived labels and create the decision trees
-forest = forest.fit(train_data[0::,1::],train_data[0::,0])
-
-# Take the same decision trees and run it on the test data
-output = forest.predict(test_data)
+if __name__=="__main__":
+    main()
